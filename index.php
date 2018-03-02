@@ -44,6 +44,7 @@ use src\Message;
         </div>
 
         <button type="submit" class="btn btn-primary" name="send" id="send">Send message</button>
+        <img src="assets/img/ajax-loader.gif" style="display: none" id="loader" />
         </form><br><br>
         <!-- form-->
     </div>
@@ -52,7 +53,8 @@ use src\Message;
     <br><br>
     <div id="notice"></div>
 
-        <div id="messages"></div>
+    <div id="new_message"></div>
+    <div id="messages"></div>
         <?php
             $msg = new Message();
             if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 1){
@@ -121,9 +123,25 @@ use src\Message;
         $( "#b_date" ).datepicker({dateFormat: 'yy-mm-dd'});
     });
 
+    function disableElements(){
+        $("#name").prop('disabled', true);
+        $("#email").prop('disabled', true);
+        $("#msg").prop('disabled', true);
+        $("#b_date").prop('disabled', true);
+        $("#send").hide();
+        $("#loader").show();
+    }
+    function enableElements(){
+        $("#name").prop('disabled', false);
+        $("#email").prop('disabled', false);
+        $("#msg").prop('disabled', false);
+        $("#b_date").prop('disabled', false);
+        $("#send").show();
+        $("#loader").hide();
+    }
+
     $("#msg_form").submit(function(e){
         e.preventDefault();
-
         var message = {};
         //put all data from form to message object
         $.each($( this ).serializeArray(), function(key, val){
@@ -134,7 +152,10 @@ use src\Message;
         var req = $.ajax({
                 url: 'controller.php',
                 method: 'POST',
-                data: message
+                data: message,
+                beforeSend: function(){
+                    disableElements();
+                }
             })
             .done(function(data) {
 
@@ -144,8 +165,10 @@ use src\Message;
 
                 var msg_block = `<div class="card">
                                     <div class="card-header">
+                                    <h6><span class="badge badge-secondary">New</span>
                                         ${data.name}, ${data.age}  <small>[${data.date_created}]</small>
                                     </div>
+                                    </h6>
                                     <div class="card-body">
                                         <blockquote class="blockquote mb-0">
                                         <p>${data.msg}</p>
@@ -153,7 +176,7 @@ use src\Message;
                                     </div>
                                     </div><br>`;
 
-            $("#messages").append(msg_block);    
+            $("#new_message").html(msg_block);    
 
             })
             .fail(function(data) {
@@ -163,11 +186,11 @@ use src\Message;
                 var notice = `<div class="alert alert-danger">${val}</div>`;
                 $("#notice").prepend(notice);
                })
-              
             })
             .always(function() {
-            ;
+                enableElements();
             }); 
+
     })
     </script>
   </body>

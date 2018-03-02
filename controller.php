@@ -4,10 +4,11 @@ use src\Message;
 
     if(isset($_POST['msg'])){
 
-        $data['name'] = $_POST['name'];
+        $data['name'] = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
         $data['b_date'] = $_POST['b_date'];
-        $data['msg'] = $_POST['msg'];
+        $data['msg'] = filter_var($_POST['msg'], FILTER_SANITIZE_STRING);
         $data['email'] = $_POST['email'];
+        //this is for JS respomse
         $data['age'] = Message::getAge($_POST['b_date']);
         $data['date_created'] = date('Y-m-d H:i:s');
 

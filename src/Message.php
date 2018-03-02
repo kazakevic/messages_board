@@ -102,7 +102,7 @@ class Message extends Database
             $errors[] = "Please enter your birth date!";
         }
         //checking Year, month,day
-        if(!checkdate($date_info[1], $date_info[2], $date_info[0])){
+        if(!empty($message_data['b_date']) && !checkdate($date_info[1], $date_info[2], $date_info[0])){
             $errors[] = "Wrong date!";
         }
         if(self::isFuture($message_data['b_date'])){
@@ -113,7 +113,7 @@ class Message extends Database
             $errors[] = "Please enter message!";
         }
        
-        if (!filter_var($message_data['email'], FILTER_VALIDATE_EMAIL)) {
+        if (!empty($message_data['email']) && !filter_var($message_data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Email is not valid!";
         }
        
