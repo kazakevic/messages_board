@@ -50,8 +50,9 @@ class Message extends Database
 
         $limit = self::MESSAGES_PER_PAGE;
         $res = false;
-        $sql = "SELECT * FROM messages LIMIT :offset, :limit";
+        $sql = "SELECT * FROM messages ORDER BY date_created DESC LIMIT :offset, :limit";
         $sth = $this->getConnection()->prepare($sql);
+        //$sth->debugDumpParams();
 
         $sth->bindParam(':offset', $offset, PDO::PARAM_INT); 
         $sth->bindParam(':limit', $limit, PDO::PARAM_INT); 
@@ -90,12 +91,22 @@ class Message extends Database
 
         $errors = [];
 
+        //this is need for checkdate function
+        $date_info = explode("-", $message_data['b_date']);
+
         if(empty($message_data['name'])){
             $errors[] = "Name is empty!";
         }
 
         if(empty($message_data['b_date'])){
             $errors[] = "Please enter your birth date!";
+        }
+        //checking Year, month,day
+        if(!checkdate($date_info[1], $date_info[2], $date_info[0])){
+            $errors[] = "Wrong date!";
+        }
+        if(self::isFuture($message_data['b_date'])){
+            $errors[] = "Birth date cannot be future!";
         }
         
         if(empty($message_data['msg'])){
@@ -105,6 +116,7 @@ class Message extends Database
         if (!filter_var($message_data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Email is not valid!";
         }
+       
         return $errors;
     }
 
@@ -112,6 +124,18 @@ class Message extends Database
         return $this->getConnection()
         ->query("SELECT count(id) as cnt FROM messages")
         ->fetchColumn();
+    }
+
+    public function isFuture($date){
+        $current_date = new DateTime("now", new DateTimeZone('UTC'));
+        $another_date = new DateTime($date." 00:00", new DateTimeZone('UTC'));
+
+        if($another_date > $current_date){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 }
