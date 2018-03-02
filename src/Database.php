@@ -1,7 +1,6 @@
 <?php
 namespace src;
 use PDO;
-
 abstract class Database {
     const USERNAME="root";
     const PASSWORD="";

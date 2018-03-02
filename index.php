@@ -19,13 +19,13 @@ use src\Message;
 
     <div class="row">
 
-    <div class="col-md-4"></div>
-        <!-- form-->
-        <form method="POST" action="">
+    <div class="col-md-4">
+           <!-- form-->
+        <form method="POST" action="" id="msg_form">
 
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" name="name" class="form-control" id="name" placeholder="Enter name and surname">
+            <input type="text" name="name" class="form-control" id="name" placeholder="Enter name and surname" value="John McDoh">
         </div>
 
         <div class="form-group">
@@ -35,29 +35,58 @@ use src\Message;
 
         <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
+            <input type="email" name="email" class="form-control" id="email" placeholder="Enter email" value="test@test.lt">
         </div>
     
          <div class="form-group">
             <label for="msg">Your message:</label>
-            <textarea class="form-control" id="msg" name="msg" rows="3"></textarea>
+            <textarea class="form-control" id="msg" name="msg" rows="3">Test message <?php echo uniqid(); ?></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Send message</button>
-        </form>
+        <button type="submit" class="btn btn-primary" name="send" id="send">Send message</button>
+        </form><br><br>
         <!-- form-->
+    </div>
 
     <div class="col-md-4">
-    
-        <div id="data"></div>
+    <br><br>
+    <div id="notice"></div>
+
+        <div id="messages"></div>
+        <?php
+            $msg = new Message();
+            $messages = $msg->getAllMessages();
+
+            if(!empty($messages)):
+                foreach($messages as $message):?>
+                <div class="card mb-2">
+                <div class="card-header">
+                <?php
+                $head = ", ".Message::getAge($message->b_date)." <small>[".$message->date_created."]</small>";
+
+                if(!empty($message->email)): ?>
+                    <a href="mailto:<?php echo $message->email ?>"><?php echo $message->name ?></a><?php echo $head ?>
+                <?php else:
+                echo $message->name.$head;
+                endif;
+                ?>
+                </div>
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                    <p><?php echo $message->msg ?></p>
+                    </blockquote>
+                </div>
+                </div>
+                <?php 
+                endforeach;
+            endif;
+            ?>
     </div>
 
     <div class="col-md-4"></div>
     </div>
     </div>
 
-
-      
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -65,9 +94,56 @@ use src\Message;
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
+
     $( function() {
-        $( "#b_date" ).datepicker();
-    } );
+        $( "#b_date" ).datepicker({dateFormat: 'yy-mm-dd'});
+    });
+
+    $("#msg_form").submit(function(e){
+        e.preventDefault();
+
+        var message = {};
+        //put all data from form to message object
+        $.each($( this ).serializeArray(), function(key, val){
+            var prop = val.name; 
+            message[prop] = val.value;
+        })
+
+        //send data to PHP
+        var req = $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                data: message
+            })
+            .done(function(data) {
+
+                var notice = `<div class="alert alert-success">Message saved</div>`;
+                $("#notice").html("");
+                $("#notice").append(notice);
+
+                var msg_block = `<div class="card">
+                                    <div class="card-header">
+                                        ${data.name}, ${data.age}  <small>[${data.date_created}]</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0">
+                                        <p>${data.msg}</p>
+                                        </blockquote>
+                                    </div>
+                                    </div><br>`;
+
+            $("#messages").append(msg_block);    
+
+            })
+            .fail(function() {
+                var notice = `<div class="alert alert-danger">Erorr</div>`;
+                $("#notice").html("");
+                $("#notice").prepend(notice);
+            })
+            .always(function() {
+            ;
+            }); 
+    })
     </script>
   </body>
 </html>
