@@ -1,6 +1,8 @@
 <?php
 namespace src;
 use PDO;
+use DateTime;
+use DateTimeZone;
 
 class Message extends Database
 {
@@ -57,7 +59,12 @@ class Message extends Database
 
     public static function getAge($date){
        
-        $age = floor((time() - strtotime($date)) / (60*60*24*365));
+        $current_date = new DateTime("now", new DateTimeZone('UTC'));
+        $another_date = new DateTime($date." 00:00", new DateTimeZone('UTC'));
+
+        $difference = $another_date->diff($current_date);
+
+        $age = $difference->format('%y');
         if($age < 0){
             $age = 0;
         }
