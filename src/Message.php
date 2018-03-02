@@ -71,5 +71,33 @@ class Message extends Database
         return $age;
     }
 
+    public static function MessageValidate($message_data){
+
+        $errors = [];
+
+        if(empty($message_data['name'])){
+            $errors[] = "Name is empty!";
+        }
+
+        if(empty($message_data['b_date'])){
+            $errors[] = "Please enter your birth date!";
+        }
+        
+        if(empty($message_data['msg'])){
+            $errors[] = "Please enter message!";
+        }
+       
+        if (!filter_var($message_data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Email is not valid!";
+        }
+
+     
+        return $errors;
+       
+
+        
+    }
+
+
 }
 

@@ -108,7 +108,6 @@ use src\Message;
             var prop = val.name; 
             message[prop] = val.value;
         })
-
         //send data to PHP
         var req = $.ajax({
                 url: 'controller.php',
@@ -135,10 +134,14 @@ use src\Message;
             $("#messages").append(msg_block);    
 
             })
-            .fail(function() {
-                var notice = `<div class="alert alert-danger">Erorr</div>`;
-                $("#notice").html("");
+            .fail(function(data) {
+
+               $("#notice").html("");
+               $.each(data.responseJSON, function(key, val){
+                var notice = `<div class="alert alert-danger">${val}</div>`;
                 $("#notice").prepend(notice);
+               })
+              
             })
             .always(function() {
             ;
