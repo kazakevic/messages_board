@@ -7,6 +7,9 @@ use DateTimeZone;
 class Message extends Database
 {
     private $message_data = [];
+    const MESSAGES_PER_PAGE = 5;
+
+    public static $page = 1;
 
     public function __construct($data = false){
         if($data) {
@@ -15,7 +18,6 @@ class Message extends Database
             $this->message_data['msg'] = $data['msg'];
             $this->message_data['email'] = $data['email'];
         }
-
     }
 
     public function saveMessage(){
@@ -34,11 +36,25 @@ class Message extends Database
         return true;
     }
 
-    public function getAllMessages($order = 'date_created'){
-        $res = false;
+    public function getAllMessages(){
 
-        $sql = "SELECT * FROM messages order by $order DESC";
+        $page = self::$page;
+        if($page > Message::getMessagesCount() % Message::MESSAGES_PER_PAGE ) 
+        {
+            self::$page = Message::getMessagesCount() % Message::MESSAGES_PER_PAGE;
+        }
+        else if ($page < 1){
+            self::$page = 1;
+        }
+        $offset = ($page * Message::MESSAGES_PER_PAGE) - Message::MESSAGES_PER_PAGE;
+
+        $limit = self::MESSAGES_PER_PAGE;
+        $res = false;
+        $sql = "SELECT * FROM messages LIMIT :offset, :limit";
         $sth = $this->getConnection()->prepare($sql);
+
+        $sth->bindParam(':offset', $offset, PDO::PARAM_INT); 
+        $sth->bindParam(':limit', $limit, PDO::PARAM_INT); 
         $sth->execute();
 
         if($sth->rowCount() > 0){
@@ -54,7 +70,6 @@ class Message extends Database
         $sth->execute(['id' => $id]);
         $res = $sth->fetch(PDO::FETCH_OBJ);
         return $res;
-
     }
 
     public static function getAge($date){
@@ -90,14 +105,14 @@ class Message extends Database
         if (!filter_var($message_data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Email is not valid!";
         }
-
-     
         return $errors;
-       
-
-        
     }
 
+    public function getMessagesCount(){
+        return $this->getConnection()
+        ->query("SELECT count(id) as cnt FROM messages")
+        ->fetchColumn();
+    }
 
 }
 

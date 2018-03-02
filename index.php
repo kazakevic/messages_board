@@ -55,8 +55,11 @@ use src\Message;
         <div id="messages"></div>
         <?php
             $msg = new Message();
+            if(isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 1){
+                Message::$page = $_GET['page'];
+            }
+  
             $messages = $msg->getAllMessages();
-
             if(!empty($messages)):
                 foreach($messages as $message):?>
                 <div class="card mb-2">
@@ -81,6 +84,25 @@ use src\Message;
                 endforeach;
             endif;
             ?>
+
+
+    <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <?php $current_page = Message::$page; ?>
+        <li class="page-item"><a class="page-link" href="index.php?page=<?php echo $current_page - 1 ?>">Previous</a></li>
+
+        <?php 
+        $page = 0;
+            for($i = 1; $i < $msg->getMessagesCount(); $i+=Message::MESSAGES_PER_PAGE): 
+            $page++;
+        ?>
+
+        <li class="page-item"><a class="page-link" href="index.php?page=<?php echo $page; ?>"><?php echo $page ?></a></li>
+        <?php endfor; ?>
+        <li class="page-item"><a class="page-link" href="index.php?page=<?php echo $current_page+ 1 ?>">Next</a></li>
+    </ul>
+    </nav>
+
     </div>
 
     <div class="col-md-4"></div>

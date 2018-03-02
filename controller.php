@@ -2,7 +2,6 @@
 require_once "vendor/autoload.php";
 use src\Message;
 
-
     if(isset($_POST['msg'])){
 
         $data['name'] = $_POST['name'];
