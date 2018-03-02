@@ -1,0 +1,17 @@
+{
+    "name": "darkzk/msg_board",
+    "description": "Message board system",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Darjuš Kazakevič",
+            "email": "darjus.kazakevic@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-4": {
+          "src\\" : "src"
+      }
+  }
+}
