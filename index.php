@@ -1,11 +1,12 @@
 <?php
 require_once "vendor/autoload.php";
 use src\Message;
+session_start();
 ?>
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Title</title>
+    <title>Message Board</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -20,8 +21,9 @@ use src\Message;
     <div class="row">
 
     <div class="col-md-4">
-           <!-- form-->
-        <form method="POST" action="" id="msg_form">
+
+        <!-- form-->
+        <form method="POST" action="controller_nojs.php" id="msg_form">
 
         <div class="form-group">
             <label for="name">Name</label>
@@ -51,7 +53,20 @@ use src\Message;
 
     <div class="col-md-4">
     <br><br>
-    <div id="notice"></div>
+    <div id="notice">
+    <?php if(isset($_SESSION['errors'])): ?>
+        <?php foreach($_SESSION['errors'] as $error): ?>
+            <div class="alert alert-danger"><?php echo $error; ?></div>
+        <?php endforeach; ?>
+        <!-- Clear messages after first show-->
+        <?php unset($_SESSION['errors']) ?>
+    <?php endif; ?>
+
+    <?php if(isset($_SESSION['notice'])): ?>
+        <div class="alert alert-success"><?php echo $_SESSION['notice']; ?></div>
+    <?php unset($_SESSION['notice']) ?>
+    <?php endif; ?>
+    </div>
 
     <div id="new_message"></div>
     <div id="messages"></div>

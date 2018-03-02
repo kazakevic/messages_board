@@ -1,13 +1,13 @@
 <?php
 require_once "vendor/autoload.php";
 use src\Message;
+session_start();
 
-    if($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        die("Can't access this page");
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die("Can't access this page");
     }
- 
-    if(isset($_POST['msg'])){
 
+    if(isset($_POST['msg'])){
         $data['name'] = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
         $data['b_date'] = $_POST['b_date'];
         $data['msg'] = filter_var($_POST['msg'], FILTER_SANITIZE_STRING);
@@ -21,16 +21,11 @@ use src\Message;
         if(empty($validation_errors)){
             $message = new Message($data);
             $message->saveMessage();
-              //retunr json message
-              header("Access-Control-Allow-Origin: *");
-              header("Content-Type: application/json; charset=UTF-8");
-              echo json_encode($data);
+            $_SESSION['notice'] = "Message added!";
+            header('Location: index.php'); 
         } else {
-              //retunr json message
-              header('HTTP/1.0 500 Internal Server Error');
-              header("Access-Control-Allow-Origin: *");
-              header("Content-Type: application/json; charset=UTF-8");
-              echo json_encode($validation_errors);
+            $_SESSION['errors'] = $validation_errors;
+            header('Location: index.php'); 
         }
           
     }
