@@ -11,6 +11,11 @@ class Message extends Database
 
     public static $page = 1;
 
+    /**
+     * Set propertis when message object is create if data is passsed
+     *
+     * @param boolean|array $data
+     */
     public function __construct($data = false){
         if($data) {
             $this->message_data['name'] = $data['name'];
@@ -20,22 +25,28 @@ class Message extends Database
         }
     }
 
+    /**
+     * Stores messages in DB
+     *
+     * @return void
+     */
     public function saveMessage(){
-    
         $sql = "INSERT INTO messages(name, b_date, msg, email) VALUES (:name, :b_date, :msg, :email)";
-        $sth = $this->getConnection()->prepare($sql);
-            $sth->execute(
-                [
-                    'name' => $this->message_data['name'],
-                    'b_date' => $this->message_data['b_date'],
-                    'msg' => $this->message_data['msg'],
-                    'email' => $this->message_data['email']
-                ]
-            );
-           
+            $this->query($sql,[
+                'name' => $this->message_data['name'],
+                'b_date' => $this->message_data['b_date'],
+                'msg' => $this->message_data['msg'],
+                'email' => $this->message_data['email']
+            ] );
         return true;
     }
-
+    /**
+     * Read all messages from DB
+     * Order by date_create DESC
+     * Paginates messages by static properties and const - MESSAGES_PER_PAGE
+     *
+     * @return array
+     */
     public function getAllMessages(){
 
         $page = self::$page;
@@ -64,15 +75,12 @@ class Message extends Database
         return $res;
     }
 
-    public function getMessageById($id){
-
-        $sql = "SELECT * FROM messages WHERE id=:id";
-        $sth = $this->getConnection()->prepare($sql);
-        $sth->execute(['id' => $id]);
-        $res = $sth->fetch(PDO::FETCH_OBJ);
-        return $res;
-    }
-
+    /**
+     * Count age by provided date
+     *
+     * @param [string] $date
+     * @return string
+     */
     public static function getAge($date){
        
         $current_date = new DateTime("now", new DateTimeZone('UTC'));
@@ -86,7 +94,12 @@ class Message extends Database
         }
         return $age;
     }
-
+    /**
+     * Full message validation
+     *
+     * @param [array] $message_data - message data array
+     * @return array with errors or empty array
+     */
     public static function MessageValidate($message_data){
 
         $errors = [];
@@ -120,10 +133,15 @@ class Message extends Database
         return $errors;
     }
 
+    /**
+     * Just gets messages count for pagination
+     *
+     * @return int - messages count
+     */
     public function getMessagesCount(){
-        return $this->getConnection()
-        ->query("SELECT count(id) as cnt FROM messages")
+        return $this->query("SELECT count(id) as cnt FROM messages", [])
         ->fetchColumn();
+        
     }
 
     public function isFuture($date){

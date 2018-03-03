@@ -82,6 +82,7 @@ session_start();
                 <div class="card mb-2">
                 <div class="card-header">
                 <?php
+                
                 $head = ", ".Message::getAge($message->b_date)." <small>[".$message->date_created."]</small>";
 
                 if(!empty($message->email)): ?>
@@ -89,6 +90,7 @@ session_start();
                 <?php else:
                 echo $message->name.$head;
                 endif;
+
                 ?>
                 </div>
                 <div class="card-body">
@@ -132,6 +134,7 @@ session_start();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="maplabel-compiled.js"></script>
     <script>
 
     $( function() {
